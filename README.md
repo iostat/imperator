@@ -1,8 +1,8 @@
 # imperator
-See the examples folder to get a sense of how it works.
+See the `examples` folder to get a sense of how it works.
 
 ## Building / Running
-You'll just need the Haskell `stack`
+You'll just need the [Haskell `stack`](https://docs.haskellstack.org/en/stable/README/)
 ```
 git clone https://github.com/iostat/imperator.git
 cd imperator
