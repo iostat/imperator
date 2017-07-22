@@ -1,5 +1,7 @@
 module Imperator.Syntax where
 
+import Imperator.Util (xor)
+
 -- Arithmetic operators
 data ArithOp = ArithAdd
              | ArithSub
@@ -8,6 +10,14 @@ data ArithOp = ArithAdd
              | ArithPow
              deriving (Eq, Ord, Read, Show)
 
+-- lower an ArithOp from its AST rep into a haskell function
+lowerArithOp :: Integral n => ArithOp -> (n -> n -> n)
+lowerArithOp ArithAdd = (+) 
+lowerArithOp ArithSub = (-)
+lowerArithOp ArithMul = (*)
+lowerArithOp ArithDiv = quot
+lowerArithOp ArithPow = (^)
+
 data ArithCmp = ArithGT
               | ArithLT
               | ArithEQ
@@ -15,6 +25,15 @@ data ArithCmp = ArithGT
               | ArithGTE
               | ArithLTE
               deriving (Eq, Ord, Read, Show)
+
+-- lower an ArithCmp from its AST rep into a haskell function
+lowerArithCmp :: Ord o => ArithCmp -> (o -> o -> Bool)
+lowerArithCmp ArithGT  = (>)
+lowerArithCmp ArithLT  = (<)
+lowerArithCmp ArithEQ  = (==)
+lowerArithCmp ArithNEQ = (/=)
+lowerArithCmp ArithGTE = (>=)
+lowerArithCmp ArithLTE = (<=)
 
 -- Arithmetic Expression
 data ArithE = VarLiteral String
@@ -29,6 +48,12 @@ data BoolOp = BoolAnd
             | BoolOr
             | BoolXor
             deriving (Eq, Ord, Read, Show)
+
+-- lower a BoolOp from its AST rep into a haskell function
+lowerBoolOp :: BoolOp -> (Bool -> Bool -> Bool)
+lowerBoolOp BoolAnd = (&&)
+lowerBoolOp BoolOr  = (||)
+lowerBoolOp BoolXor = xor
 
 -- Boolean Expression
 data BoolE = BoolConst Bool

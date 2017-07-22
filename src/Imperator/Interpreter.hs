@@ -17,8 +17,7 @@ import           Data.Map                          (Map)
 import qualified Data.Map                          as Map
 
 import           Imperator.Syntax
-import           Imperator.Util                    (readDateTime, showDateTime,
-                                                    xor)
+import           Imperator.Util                    (readDateTime, showDateTime)
 
 instance Default ImperatorContext where
   def = ImperatorContext def
@@ -62,9 +61,7 @@ runStatement (StmtPrintln)  = liftIO $ putStrLn ""
 runStatement (StmtNop)      = return ()
 
 runPrompt :: String -> ImperatorM String
-runPrompt p = do
-  liftIO . putStr $ p ++ "> "
-  liftIO $ getLine
+runPrompt p = liftIO $ (putStr $ p ++ "> ") >> getLine
 
 runVarInitializer :: VarInitializer -> ImperatorM Integer
 runVarInitializer (VarInitExpr expr)      = runArithE expr
@@ -82,33 +79,10 @@ runArithE (VarLiteral identifier) = use (vars . at identifier) >>= \case
   Nothing -> lift . left $ UndefinedVariable identifier
   Just v  -> return v
 runArithE (ArithNegate e) = negate <$> runArithE e
-runArithE (ArithBinE op l r) = do
-  l' <- runArithE l
-  r' <- runArithE r
-  return $ case op of
-    ArithAdd -> l' + r'
-    ArithSub -> l' - r'
-    ArithMul -> l' * r'
-    ArithDiv -> quot l' r'
-    ArithPow -> l' ^ r'
+runArithE (ArithBinE op l r) = (lowerArithOp op) <$> (runArithE l) <*> (runArithE r)
 
 runBoolE :: BoolE -> ImperatorM Bool
-runBoolE (BoolConst b) = return b
-runBoolE (BoolNegate e) = not <$> runBoolE e
-runBoolE (BinBoolE op l r) = do
-  l' <- runBoolE l
-  r' <- runBoolE r
-  return $ case op of
-    BoolAnd -> l' && r'
-    BoolOr  -> l' || r'
-    BoolXor -> l' `xor` r'
-runBoolE (ArithCmpE op l r) = do
-  l' <- runArithE l
-  r' <- runArithE r
-  return $ case op of
-    ArithGT  -> l' > r'
-    ArithLT  -> l' < r'
-    ArithGTE -> l' >= r'
-    ArithLTE -> l' <= r'
-    ArithEQ  -> l' == r'
-    ArithNEQ -> l' /= r'
+runBoolE (BoolConst b)      = return b
+runBoolE (BoolNegate e)     = not <$> runBoolE e
+runBoolE (BinBoolE op l r)  = (lowerBoolOp op) <$> (runBoolE l) <*> (runBoolE r)
+runBoolE (ArithCmpE op l r) = (lowerArithCmp op) <$> (runArithE l) <*> (runArithE r)
