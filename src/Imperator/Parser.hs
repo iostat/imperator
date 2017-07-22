@@ -10,6 +10,7 @@ import           Text.ParserCombinators.Parsec.Language
 import qualified Text.ParserCombinators.Parsec.Token    as Token
 
 import           Imperator.Syntax
+import           Imperator.Util                         (readDateTime)
 
 parseImperator :: SourceName -> String -> Either ParseError Statement
 parseImperator = parse statement
@@ -122,7 +123,11 @@ statement = whiteSpace >> (parens statement <|> multipleStatements)
 
         parseArithE = buildExpressionParser arithOps arithTerm
         arithTerm   = parens parseArithE <|> (VarLiteral <$> identifier) <|> (IntConst <$> integer) <|> parseDateTimeExpr
-        parseDateTimeExpr = angles (many $ noneOf "<>") >>= return . DateTimeConst
+        parseDateTimeExpr = do
+          angleCapture <- angles (many $ noneOf "<>")
+          case readDateTime angleCapture of
+            Nothing  -> fail "Invalid DateTime literal"
+            Just int -> return $ IntConst int
         arithOps    = [ [ Prefix (reservedOpRep "-" ArithNegate)
                         ]
                       , [ Infix (reservedOpRep "**" (ArithBinE ArithPow)) AssocLeft

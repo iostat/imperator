@@ -1,6 +1,6 @@
 module Imperator.Syntax where
 
-import Imperator.Util (xor)
+import           Imperator.Util (xor)
 
 -- Arithmetic operators
 data ArithOp = ArithAdd
@@ -12,7 +12,7 @@ data ArithOp = ArithAdd
 
 -- lower an ArithOp from its AST rep into a haskell function
 lowerArithOp :: Integral n => ArithOp -> (n -> n -> n)
-lowerArithOp ArithAdd = (+) 
+lowerArithOp ArithAdd = (+)
 lowerArithOp ArithSub = (-)
 lowerArithOp ArithMul = (*)
 lowerArithOp ArithDiv = quot
@@ -38,7 +38,6 @@ lowerArithCmp ArithLTE = (<=)
 -- Arithmetic Expression
 data ArithE = VarLiteral String
             | IntConst Integer
-            | DateTimeConst String
             | ArithNegate ArithE
             | ArithBinE ArithOp ArithE ArithE
             deriving (Eq, Ord, Read, Show)

@@ -24,7 +24,6 @@ instance Default ImperatorContext where
 
 data ImperatorError = UndefinedVariable String
                     | AttemptedRedefinition String
-                    | InvalidDateTimeLiteral String
                     deriving (Eq, Ord, Read, Show)
 
 type ImperatorM a = StateT ImperatorContext (EitherT ImperatorError IO) a
@@ -72,9 +71,6 @@ runVarInitializer i@(VarInitPromptDate p) = readDateTime <$> runPrompt p >>= \ca
 
 runArithE :: ArithE -> ImperatorM Integer
 runArithE (IntConst c) = return c
-runArithE (DateTimeConst c) = case readDateTime c of
-  Nothing -> lift . left $ InvalidDateTimeLiteral c
-  Just v  -> return v
 runArithE (VarLiteral identifier) = use (vars . at identifier) >>= \case
   Nothing -> lift . left $ UndefinedVariable identifier
   Just v  -> return v
