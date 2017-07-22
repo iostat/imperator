@@ -14,7 +14,7 @@ var number invoice baseInvoiceValue;
 
 // req 1
 if shippedItemsCount < smallShipmentDiscountCutoff
-	then (set invoice (invoice - 1000))
+	then (set invoice (invoice - smallShipmentDiscountValue))
 	else (nop);
 
 print "Invoice after req 1 is: ";
@@ -22,7 +22,7 @@ puti invoice;
 
 // req 2
 if paymentDate >= latePaymentCutoff
-    then (set invoice (invoice + 1000))
+    then (set invoice (invoice + latePaymentPenalty))
     else (nop);
 
 print "Invoice after req 2 is: ";
@@ -30,8 +30,8 @@ puti invoice;
 
 // req 3: compose em!
 if shippedItemsCount >= smallShipmentDiscountCutoff || paymentDate >= latePaymentCutoff
-    then (set invoice (invoice + 1000))
-    else (set invoice (invoice - 1000));
+    then (set invoice (invoice + doubleOrNothingPenalty))
+    else (set invoice (invoice - doubleOrNothingPenalty));
 
 print "Invoice after req 3 is: ";
 puti invoice

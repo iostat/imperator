@@ -12,7 +12,7 @@ var number d c + b;
 
 
 print "c = ";
-puti d;
+puti c;
 
 print "c + b = d = ";
 puti d;
