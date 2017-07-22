@@ -86,14 +86,16 @@ statement = whiteSpace >> (parens statement <|> multipleStatements)
           falseCase <- statement
           return $ StmtConditional cond trueCase falseCase
 
-        putsStmt    = reserved "puts"    >> stringLiteral >>= return . StmtPutS
-        putiStmt    = reserved "puti"    >> parseArithE   >>= return . StmtPutI
-        putdStmt    = reserved "putd"    >> parseArithE   >>= return . StmtPutD
-        printsStmt  = reserved "print"   >> stringLiteral >>= return . StmtPrintS
-        printiStmt  = reserved "printi"  >> parseArithE   >>= return . StmtPrintI
-        printdStmt  = reserved "printd"  >> parseArithE   >>= return . StmtPrintD
-        printlnStmt = reservedRep "println" StmtPrintln
-        nopStmt     = reservedRep "nop"     StmtNop
+        putsStmt    =  reserved "puts"    >> stringLiteral >>= return . StmtPutS
+        putiStmt    =  reserved "puti"    >> parseArithE   >>= return . StmtPutI
+        putdStmt    =  reserved "putd"    >> parseArithE   >>= return . StmtPutD
+        printsStmt  =  reserved "print"   >> stringLiteral >>= return . StmtPrintS
+        printiStmt  =  reserved "printi"  >> parseArithE   >>= return . StmtPrintI
+        printdStmt  =  reserved "printd"  >> parseArithE   >>= return . StmtPrintD
+        printlnStmt =  reservedRep "println" StmtPrintln
+        nopStmt     =  reservedRep "nop"    StmtNop
+                   <|> (eof >> return StmtNop) -- fix that annoying thing where you cant have a semicolon after last stmt
+                   <|> (whiteSpace >> return StmtNop) -- or multiple semicolons
 
         parseBoolE  = buildExpressionParser boolOps boolTerm
         boolTerm    = parens parseBoolE <|> parseTrue <|> parseFalse <|> parseArithCmpE
