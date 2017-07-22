@@ -8,7 +8,7 @@ git clone https://github.com/iostat/imperator.git
 cd imperator
 stack setup
 stack install
-stack exec imperator examples/some_file.dsl
+stack exec imperator -- examples/some_file.dsl # the double dash is important, stack quirk.
 ```
 
 ## Quirks
